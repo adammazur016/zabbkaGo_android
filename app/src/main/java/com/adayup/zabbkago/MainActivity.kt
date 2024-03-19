@@ -1,7 +1,7 @@
 package com.adayup.zabbkago
 
-import Todo
-import TodoApiService
+import Auth
+import authApiService
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -13,9 +13,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +38,22 @@ class MainActivity : AppCompatActivity() {
     //making the email and passwd
     var email = ""
     var pwd = ""
+
+    suspend fun makeApiCall(par1: String, par2: String): String{
+        val service = RetrofitClient.retrofitInstance.create(authApiService::class.java)
+
+        val response: Response<Auth> = withContext(Dispatchers.IO) {
+            service.getTodo(par1, par2)
+        }
+        if (response.isSuccessful) {
+            val todo = response.body()
+            todo?.let {
+                return it.auth // Assuming 'auth' is the field you're interested in
+            }
+        }
+        return "Error or default value"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,6 +62,10 @@ class MainActivity : AppCompatActivity() {
         emailEdt = findViewById(R.id.idEdtEmail)
         pwdEdt = findViewById(R.id.idEdtPassword)
         loginBtn = findViewById(R.id.idBtnLogin)
+
+        fun makeToast(){
+            Toast.makeText(this, "Please Enter Email and Password", Toast.LENGTH_SHORT).show();
+        }
 
         //Initializing shared preferences with the key to them
         sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
@@ -56,31 +80,46 @@ class MainActivity : AppCompatActivity() {
         loginBtn.setOnClickListener {
             //if there is no data entered display en error
             if (TextUtils.isEmpty(emailEdt.text.toString()) || TextUtils.isEmpty(pwdEdt.text.toString())){
-                Toast.makeText(this, "Please Enter Email and Password", Toast.LENGTH_SHORT).show();
+                makeToast()
             } else {
                 //else save the input
 
                 //API call goes here
+                lifecycleScope.launch {
+                    // Since makeApiCall is a suspend function, it can be called directly here
+                    val result = makeApiCall(emailEdt.text.toString(), pwdEdt.text.toString())
+                    // Use the result, e.g., update UI or log the result
+                    // Make sure to perform UI operations on the main thread
+                    Log.d("LoginResult", "Result: $result")
+                    // If updating UI, make sure this is run on the main thread. For example:
+                    // textView.text = result
 
-                //initializing the shared preferences editor
-                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                    if(result.toString() == "1"){
+                        Log.d("DEBUG", "poprawnie zalogowano")
+                        //initializing the shared preferences editor
+                        val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
-                //save the email and the password to the shared pref
-                Log.d("Put", emailEdt.text.toString())
-                Log.d("Put", pwdEdt.text.toString())
-                editor.putString(EMAIL_KEY, emailEdt.text.toString())
-                editor.putString(PWD_KEY, pwdEdt.text.toString())
+                        //save the email and the password to the shared pref
+                        Log.d("Put", emailEdt.text.toString())
+                        Log.d("Put", pwdEdt.text.toString())
+                        editor.putString(EMAIL_KEY, emailEdt.text.toString())
+                        editor.putString(PWD_KEY, pwdEdt.text.toString())
 
-                //apply the changes
-                editor.apply()
+                        //apply the changes
+                        editor.apply()
 
-                //get to the mainactivity2
-                val i = Intent(this@MainActivity, MainActivity2::class.java)
+                        //get to the mainactivity2
+                        val i = Intent(this@MainActivity, MainActivity2::class.java)
 
-                startActivity(i)
+                        startActivity(i)
 
-                //close the current activity
-                finish()
+                        //close the current activity
+                        finish()
+                    } else {
+                        Log.d("DEBUG", "NIEPOPRAWNIE ZALOGOWANO")
+                        makeToast()
+                    }
+                }
             }
         }
     }
