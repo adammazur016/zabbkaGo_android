@@ -59,6 +59,9 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please Enter Email and Password", Toast.LENGTH_SHORT).show();
             } else {
                 //else save the input
+
+                //API call goes here
+
                 //initializing the shared preferences editor
                 val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
