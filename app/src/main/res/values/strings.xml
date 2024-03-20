@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">zabbkaGo</string>
+    <string name="app_maps_api">AIzaSyA2GxzezhPAgBzTxLNHBzc1mZ5WWhrUpDo</string>
+
 </resources>

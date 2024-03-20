@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.webkit.WebView.FindListener
 import android.widget.Button
 import android.widget.TextView
 
@@ -12,6 +13,7 @@ class MainActivity2 : AppCompatActivity() {
     //initiate the variables
     lateinit var userTV: TextView
     lateinit var logoutBtn: Button
+    lateinit var seeMapBtn: Button
     var PREFS_KEY = "prefs"
     var EMAIL_KEY = "email"
     var email = ""
@@ -23,6 +25,7 @@ class MainActivity2 : AppCompatActivity() {
 
         userTV = findViewById(R.id.idTVUserName)
         logoutBtn = findViewById(R.id.idBtnLogOut)
+        seeMapBtn = findViewById(R.id.idSeeMapsBtn)
 //
         sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
 //
@@ -38,6 +41,12 @@ class MainActivity2 : AppCompatActivity() {
             editor.apply()
 
             val i = Intent(this@MainActivity2, MainActivity::class.java)
+            startActivity(i)
+            finish()
+        }
+
+        seeMapBtn.setOnClickListener {
+            val i = Intent(this@MainActivity2, maps::class.java)
             startActivity(i)
             finish()
         }
