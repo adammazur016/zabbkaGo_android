@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     var PREFS_KEY = "prefs"
     var EMAIL_KEY = "email"
     var PWD_KEY = "pwd"
+    var ID_KEY = "id"
+    var API_KEY = "api_key"
 
     //making the email and passwd
     var email = ""
@@ -48,6 +50,10 @@ class MainActivity : AppCompatActivity() {
         if (response.isSuccessful) {
             val todo = response.body()
             todo?.let {
+                val editor: SharedPreferences.Editor = sharedPreferences.edit()
+                editor.putString(ID_KEY, todo.id.toString())
+                editor.putString(API_KEY, todo.api_key.toString())
+                editor.apply()
                 return it.auth // Assuming 'auth' is the field you're interested in
             }
         }

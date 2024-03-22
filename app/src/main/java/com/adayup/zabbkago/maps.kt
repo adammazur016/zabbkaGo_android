@@ -1,29 +1,22 @@
 package com.adayup.zabbkago
 
-import android.Manifest
-import android.content.Intent
-import android.content.IntentSender
+import Place
+import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.location.Address
-import android.location.Geocoder
 import android.location.Location
-import android.os.Build.VERSION_CODES.M
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.dynamic.IObjectWrapper
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.LocationSource.OnLocationChangedListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CircleOptions
@@ -33,16 +26,14 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
-import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Marker
-import java.io.IOException
-import java.util.Locale
-import java.util.concurrent.TimeUnit
+import getPlacesApiService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import retrofit2.Response
 import kotlin.math.sqrt
 
 class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
@@ -56,6 +47,29 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
 
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
+
+
+    lateinit var sharedPreferences: SharedPreferences
+    val API_KEY = "api_key"
+    var PREFS_KEY = "prefs"
+    suspend fun makeApiCall(): List<Place>{
+        val service = RetrofitClient.retrofitInstance.create(getPlacesApiService::class.java)
+        sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+        val apiKey = sharedPreferences.getString(API_KEY, null).toString()
+        val response: Response<List<Place>> = withContext(Dispatchers.IO) {
+            service.GetPlaces(apiKey)
+        }
+        if (response.isSuccessful) {
+            val res = response.body()
+            res?.let {
+
+                return it
+            }
+        }
+
+
+        return emptyList()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +87,12 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
                     // Handle the new location update here
-                    Log.d("chuuuhj", "chuuuuj")
                     currentLocation = location
-                    updateMapLocation(location) // You'll implement this method next
+                    lifecycleScope.launch {
+
+                        //update only the user info
+                        updateMapLocation(currentLocation)
+                    } // You'll implement this method next
                 }
             }
         }
@@ -83,15 +100,41 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
         getCurrentLocationUser()
     }
 
-    private fun updateMapLocation(location: Location) {
+    private fun addMarker(place : Place){
+        val test1 = LatLng(place.latitude, place.longitude)
+        mMap.addMarker(MarkerOptions().position(test1).title("test marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.markericon50)))
+    }
+
+    var punkty: List<Place> = emptyList()
+    private fun updateMapLocation(location: Location, points: List<Place>) {
         val latLng = LatLng(location.latitude, location.longitude)
         mMap.clear() // Clear the previous location marker
+
         mMap.addMarker(MarkerOptions().position(latLng).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.test50)))
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
         mMap.addCircle(CircleOptions().center(latLng).strokeColor(Color.argb(220, 4, 237, 0)).radius(30.0).fillColor(Color.argb(80,194, 250, 192)))
 
-        val test1 = LatLng(50.754529, 17.616104)
-        mMap.addMarker(MarkerOptions().position(test1).title("test marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.markericon50)))
+        punkty = points
+
+        for(point in points){
+            addMarker(point)
+        }
+    }
+
+    private fun updateMapLocation(location: Location) {
+        val latLng = LatLng(location.latitude, location.longitude)
+        mMap.clear()
+        mMap.setMinZoomPreference(15f)
+        mMap.setMaxZoomPreference(18f)
+        // Clear the previous location marker
+
+        mMap.addMarker(MarkerOptions().position(latLng).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.test50)))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+        mMap.addCircle(CircleOptions().center(latLng).strokeColor(Color.argb(220, 4, 237, 0)).radius(30.0).fillColor(Color.argb(80,194, 250, 192)))
+
+        for(point in punkty){
+            addMarker(point)
+        }
     }
 
     private fun getVectorLength(x1: Double, x2: Double, y1: Double, y2: Double): Double{
@@ -143,8 +186,11 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
         // SETTING THE LOCATION TO ADD TO MAP TO USER LOCATION
         mMap = googleMap
         mMap.setOnMarkerClickListener(this)
+        lifecycleScope.launch {
+            var points = makeApiCall()
+            updateMapLocation(currentLocation, points)
+        }
 
-        updateMapLocation(currentLocation)
 
     }
 
