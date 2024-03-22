@@ -64,8 +64,8 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         locationRequest = LocationRequest.create().apply {
-            interval = 3000 // Request location update every 10 seconds
-            fastestInterval = 2000 // The fastest interval for location updates, 5 seconds
+            interval = 1000 // Request location update every 10 seconds
+            fastestInterval = 500 // The fastest interval for location updates, 5 seconds
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
@@ -88,7 +88,7 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
         mMap.clear() // Clear the previous location marker
         mMap.addMarker(MarkerOptions().position(latLng).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.test50)))
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
-        mMap.addCircle(CircleOptions().center(latLng).strokeColor(Color.rgb(4, 237, 0)).radius(30.0).fillColor(Color.rgb(194, 250, 192)))
+        mMap.addCircle(CircleOptions().center(latLng).strokeColor(Color.argb(220, 4, 237, 0)).radius(30.0).fillColor(Color.argb(80,194, 250, 192)))
 
         val test1 = LatLng(50.754529, 17.616104)
         mMap.addMarker(MarkerOptions().position(test1).title("test marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.markericon50)))
