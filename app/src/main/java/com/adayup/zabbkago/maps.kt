@@ -2,14 +2,17 @@ package com.adayup.zabbkago
 
 import Place
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
+import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
@@ -98,6 +101,13 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
         }
 
         getCurrentLocationUser()
+
+        val profileBtn: ImageView = findViewById<ImageView>(R.id.profile)
+        profileBtn.setOnClickListener {
+            val i = Intent(this@maps, MainActivity2::class.java)
+            startActivity(i)
+            finish()
+        }
     }
 
     private fun addMarker(place : Place){

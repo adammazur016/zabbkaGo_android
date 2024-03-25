@@ -5,6 +5,7 @@ import authApiService
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -13,6 +14,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Call
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     var PWD_KEY = "pwd"
     var ID_KEY = "id"
     var API_KEY = "api_key"
+    private val permissionCode = 101
 
     //making the email and passwd
     var email = ""
@@ -63,6 +66,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        if(ActivityCompat.checkSelfPermission(
+                this, android.Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+            ActivityCompat.requestPermissions(this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), permissionCode)
+            return
+        }
 
         //Binding the variables to elements from layout
         emailEdt = findViewById(R.id.idEdtEmail)
@@ -115,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                         editor.apply()
 
                         //get to the mainactivity2
-                        val i = Intent(this@MainActivity, MainActivity2::class.java)
+                        val i = Intent(this@MainActivity, maps::class.java)
 
                         startActivity(i)
 
@@ -137,7 +149,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("DEBUG", pwd)
             // if email and pwd is not empty we
             // are opening our main 2 activity on below line.
-            val i = Intent(this@MainActivity, MainActivity2::class.java)
+            val i = Intent(this@MainActivity, maps::class.java)
 
             // on below line we are calling start
             // activity method to start our activity.
@@ -147,5 +159,14 @@ class MainActivity : AppCompatActivity() {
             // finish to finish our main activity.
             finish()
         }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
     }
 }
