@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
-import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
@@ -16,6 +15,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import checkVisit
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -36,6 +36,7 @@ import getPlacesApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import makeVisit
 import retrofit2.Response
 import kotlin.math.sqrt
 
@@ -54,8 +55,9 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
 
     lateinit var sharedPreferences: SharedPreferences
     val API_KEY = "api_key"
+    val USER_ID_KEY = "id"
     var PREFS_KEY = "prefs"
-    suspend fun makeApiCall(): List<Place>{
+    suspend fun getPlaces(): List<Place>{
         val service = RetrofitClient.retrofitInstance.create(getPlacesApiService::class.java)
         sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
         val apiKey = sharedPreferences.getString(API_KEY, null).toString()
@@ -72,6 +74,40 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
 
 
         return emptyList()
+    }
+
+    suspend fun checkVisitApiCall(userID: Int, placeID: Int): String{
+        val service = RetrofitClient.retrofitInstance.create(checkVisitApiService::class.java)
+        sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+        val apiKey = sharedPreferences.getString(API_KEY, null).toString()
+        val response: Response<checkVisit> = withContext(Dispatchers.IO) {
+            service.getVisitApiService(apiKey, userID, placeID)
+        }
+        if (response.isSuccessful) {
+            val res = response.body()
+            res?.let {
+
+                return it.Status
+            }
+        }
+        return "Visit impossible"
+    }
+
+    suspend fun makeVisitApiCall(userID: Int, placeID: Int): String{
+        val service = RetrofitClient.retrofitInstance.create(makeVisitApiCall::class.java)
+        sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+        val apiKey = sharedPreferences.getString(API_KEY, null).toString()
+        val response: Response<makeVisit> = withContext(Dispatchers.IO) {
+            service.MakeVisit(apiKey, userID, placeID)
+        }
+        if (response.isSuccessful) {
+            val res = response.body()
+            res?.let {
+
+                return it.Status
+            }
+        }
+        return "Visit aborted"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,7 +148,7 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
 
     private fun addMarker(place : Place){
         val test1 = LatLng(place.latitude, place.longitude)
-        mMap.addMarker(MarkerOptions().position(test1).title("test marker").icon(BitmapDescriptorFactory.fromResource(R.drawable.markericon50)))
+        mMap.addMarker(MarkerOptions().position(test1).title(place.place_id.toString()).icon(BitmapDescriptorFactory.fromResource(R.drawable.markericon50)))
     }
 
     var punkty: List<Place> = emptyList()
@@ -197,7 +233,7 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
         mMap = googleMap
         mMap.setOnMarkerClickListener(this)
         lifecycleScope.launch {
-            var points = makeApiCall()
+            var points = getPlaces()
             updateMapLocation(currentLocation, points)
         }
 
@@ -229,15 +265,26 @@ class maps : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
 
     override fun onMarkerClick(myMarker: Marker): Boolean {
         val vectorLength: Double = getVectorLength(currentLocation.latitude, myMarker.position.latitude, currentLocation.longitude, myMarker.position.longitude)
+        val userID = sharedPreferences.getString(USER_ID_KEY, null)
+        Log.d("VECTOR LENGTH", vectorLength.toString())
+        if(vectorLength < 3.6848094149922953E-4){
+            lifecycleScope.launch {
+                val returnedStatus = userID?.let { myMarker.title?.let { it1 -> checkVisitApiCall(it.toInt(), it1.toInt()) } }
+                if(returnedStatus == "Visit possible"){
+                    Toast.makeText(applicationContext, "Putting the point to your account", Toast.LENGTH_LONG).show()
 
-        var toastText: String
-        if(vectorLength >= 3.5848094149922953E-4){
-            toastText = "Come closer to that point!"
+                    val makeVisitStatus = userID?.let { myMarker.title?.let { it1 -> makeVisitApiCall(it.toInt(), it1.toInt()) } }
+                    Log.d("DB STATUS", makeVisitStatus.toString())
+
+                } else {
+                    Toast.makeText(applicationContext, "You visited to soon, wait till tomorrow", Toast.LENGTH_LONG).show()
+                }
+            }
         } else {
-            toastText = "Point collected!"
+            Toast.makeText(applicationContext, "Get closer to that point", Toast.LENGTH_LONG).show()
         }
 
-        Toast.makeText(applicationContext, "CLICKED ON MARKER: " + myMarker.title + " - " + toastText, Toast.LENGTH_LONG).show()
+
         return true
     }
 

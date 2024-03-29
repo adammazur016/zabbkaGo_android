@@ -15,8 +15,8 @@
 
     <ImageView
         android:id="@+id/profile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="66dp"
+        android:layout_height="66dp"
         android:layout_marginBottom="16dp"
         android:elevation="10dp"
         android:src="@drawable/profile100"
