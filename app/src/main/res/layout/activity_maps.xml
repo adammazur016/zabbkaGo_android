@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".maps">
+    app:layoutDescription="@xml/activity_maps_scene"
+    tools:context=".MapsActivity">
 
-    <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
-        class="com.google.android.gms.maps.SupportMapFragment"
+    <fragment
         android:id="@+id/map_fragment"
+        class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        map:mapId = "4b81657aaeecbfac"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:mapId="4b81657aaeecbfac"
+        tools:layout_editor_absoluteX="157dp"
+        tools:layout_editor_absoluteY="232dp" />
 
     <ImageView
         android:id="@+id/profile"
-        android:contentDescription="The user profile logo"
         android:layout_width="66dp"
         android:layout_height="66dp"
         android:layout_marginBottom="16dp"
+        android:contentDescription="The user profile logo"
         android:elevation="10dp"
         android:src="@drawable/profile100"
         app:layout_constraintBottom_toBottomOf="@+id/map_fragment"
@@ -26,4 +29,34 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageView
+        android:id="@+id/frogImg"
+        android:layout_width="160dp"
+        android:layout_height="176dp"
+        android:layout_marginTop="276dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/profile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.003"
+        app:srcCompat="@drawable/frog123" />
+
+
+    <TextView
+        android:id="@+id/rankView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="28dp"
+        android:padding="10dp"
+        android:background="@color/white"
+        android:text="Rank points:"
+        android:textSize="16dp"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/profile"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+</androidx.constraintlayout.motion.widget.MotionLayout>

@@ -1,7 +1,8 @@
+package com.adayup.zabbkago.interfaces
+
+import com.adayup.zabbkago.responsesDataClasses.Auth
 import retrofit2.Response
-import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface authApiService {
@@ -9,5 +10,5 @@ interface authApiService {
     suspend fun getTodo(
         @Query("user") user: String,
         @Query("password") password: String
-    ): Response<Auth> // Ensure Auth is correctly defined to match the expected response
+    ): Response<Auth> // Ensure com.adayup.zabbkago.responsesDataClasses.Auth is correctly defined to match the expected response
 }

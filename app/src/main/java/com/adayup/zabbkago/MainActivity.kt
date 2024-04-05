@@ -1,7 +1,7 @@
 package com.adayup.zabbkago
 
-import Auth
-import authApiService
+import com.adayup.zabbkago.responsesDataClasses.Auth
+import com.adayup.zabbkago.interfaces.authApiService
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -12,13 +12,10 @@ import android.text.TextUtils
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -38,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     var PWD_KEY = "pwd"
     var ID_KEY = "id"
     var API_KEY = "api_key"
+    var RANK_KEY = "rank"
     private val permissionCode = 101
 
     //making the email and passwd
@@ -56,6 +54,7 @@ class MainActivity : AppCompatActivity() {
                 val editor: SharedPreferences.Editor = sharedPreferences.edit()
                 editor.putString(ID_KEY, todo.id.toString())
                 editor.putString(API_KEY, todo.api_key.toString())
+                editor.putString(RANK_KEY, todo.rank_points.toString())
                 editor.apply()
                 return it.auth // Assuming 'auth' is the field you're interested in
             }
@@ -127,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                         editor.apply()
 
                         //get to the mainactivity2
-                        val i = Intent(this@MainActivity, maps::class.java)
+                        val i = Intent(this@MainActivity, MapsActivity::class.java)
 
                         startActivity(i)
 
@@ -149,7 +148,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("DEBUG", pwd)
             // if email and pwd is not empty we
             // are opening our main 2 activity on below line.
-            val i = Intent(this@MainActivity, maps::class.java)
+            val i = Intent(this@MainActivity, MapsActivity::class.java)
 
             // on below line we are calling start
             // activity method to start our activity.
@@ -169,4 +168,5 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
     }
+
 }

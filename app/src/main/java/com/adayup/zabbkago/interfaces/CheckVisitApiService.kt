@@ -1,6 +1,6 @@
-package com.adayup.zabbkago
+package com.adayup.zabbkago.interfaces
 
-import checkVisit
+import com.adayup.zabbkago.responsesDataClasses.checkVisit
 import retrofit2.Response
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -11,6 +11,6 @@ interface checkVisitApiService {
         @Query("api_key") apiKey: String,
         @Query("user_id") userId: Int,
         @Query("place_id") placeID: Int
-    ): Response<checkVisit> // Adjusted to expect a List<Place> directly
+    ): Response<checkVisit> // Adjusted to expect a List<com.adayup.zabbkago.responsesDataClasses.Place> directly
 }
 
