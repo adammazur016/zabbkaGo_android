@@ -8,7 +8,6 @@ import retrofit2.http.Query
 interface addRankApiService {
     @POST("addrankpoint")
     suspend fun addRank(
-        @Query("user_id") userID: String,
         @Query("api_key") api_key: String
     ): Response<AddRank>
 

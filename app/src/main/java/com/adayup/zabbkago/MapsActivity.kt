@@ -18,9 +18,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
-import com.adayup.zabbkago.apiFunctions.checkVisitApiCall
+import com.adayup.zabbkago.apiFunctions.ID_KEY
 import com.adayup.zabbkago.apiFunctions.getPlacesApiCall
+import com.adayup.zabbkago.apiFunctions.getUserDetailsApiCall
 import com.adayup.zabbkago.apiFunctions.incrementRankApiCall
+import com.adayup.zabbkago.apiFunctions.makeVisitApiCall
+import com.adayup.zabbkago.responsesDataClasses.MakeVisit
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -37,7 +40,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
-import com.adayup.zabbkago.apiFunctions.makeVisitApiCall
+
 import kotlinx.coroutines.launch
 import kotlin.math.sqrt
 
@@ -64,8 +67,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
-
+        val userID = sharedPreferences.getString(ID_KEY, "null")
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
+        if (userID != null){
+            lifecycleScope.launch {
+                val userDetails = getUserDetailsApiCall(applicationContext, userID)
+                Log.d("DEBUG", userDetails.toString())
+            }
+        }
+
 
         locationRequest = LocationRequest.create().apply {
             interval = 1000 // Request location update every 10 seconds
@@ -98,8 +109,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
     }
 
     private fun addMarker(place : Place){
-        val test1 = LatLng(place.latitude, place.longitude)
-        mMap.addMarker(MarkerOptions().position(test1).title(place.place_id.toString()).icon(BitmapDescriptorFactory.fromResource(R.drawable.markericon50)))
+        val test1 = LatLng(place.lat, place.long)
+        mMap.addMarker(MarkerOptions().position(test1).title(place.id.toString()).icon(BitmapDescriptorFactory.fromResource(R.drawable.markericon50)))
     }
 
     var punkty: List<Place> = emptyList()
@@ -217,50 +228,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
     }
 
     override fun onMarkerClick(myMarker: Marker): Boolean {
+        lateinit var markerTitle: String
+
+        markerTitle = myMarker.title.toString()
+
         if(myMarker.title == "Current Location"){
             return true
         }
         val vectorLength: Double = getVectorLength(currentLocation.latitude, myMarker.position.latitude, currentLocation.longitude, myMarker.position.longitude)
-        val userID = sharedPreferences.getString(USER_ID_KEY, null)
         Log.d("VECTOR LENGTH", vectorLength.toString())
         if(vectorLength < 3.6848094149922953E-4){
+            Log.d("CLICKED", markerTitle)
             lifecycleScope.launch {
-                val context = applicationContext
-                val returnedStatus = userID?.let { myMarker.title?.let { it1 -> checkVisitApiCall(context, it.toInt(), it1.toInt()) } }
-                if(returnedStatus == "Visit possible"){
+                val response = makeVisitApiCall(applicationContext, markerTitle)
+
+                if (response.message == "visit_marked"){
                     Toast.makeText(applicationContext, "Putting the point to your account", Toast.LENGTH_LONG).show()
-
-                    val makeVisitStatus = userID?.let { myMarker.title?.let { it1 -> makeVisitApiCall(context, it.toInt(), it1.toInt()) } }
-                    Log.d("DB STATUS", makeVisitStatus.toString())
-                    val test = findViewById<ImageView>(R.id.frogImg)
-                    test.visibility = View.VISIBLE
-                    test.animate().apply {
-                        this.duration = 1000
-                        this.rotation(360F)
-                        withEndAction {
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                // Set the ImageView to invisible after 3 seconds
-                                test.visibility = View.INVISIBLE
-                            }, 3000)
-                        }
-                    }
-
-                    //ADD POINT TO USER RANK
-                    incrementRankApiCall(context, userID)
-                    var rank: Int = sharedPreferences.getString(RANK_KEY, null).toString().toInt()
-                    rank = rank + 1
-                    sharedPreferences.edit().putString(RANK_KEY, rank.toString()).apply()
-                    val rankView = findViewById<TextView>(R.id.rankView)
-                    rankView.setText("Rank points: " + rank.toString());
-
                 } else {
-                    Toast.makeText(applicationContext, "You visited to soon, wait till tomorrow", Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, "Please come back in next day", Toast.LENGTH_LONG).show()
+                    Log.d("CLICKED", "something went wrong")
                 }
             }
+
+
         } else {
             Toast.makeText(applicationContext, "Get closer to that point", Toast.LENGTH_LONG).show()
         }
-
 
         return true
     }

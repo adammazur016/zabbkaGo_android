@@ -1,6 +1,8 @@
 package com.adayup.zabbkago.responsesDataClasses
 data class Place(
-    val latitude: Double,
-    val longitude: Double,
-    val place_id: Int
+    val description: String,
+    val id: Int,
+    val lat: Double,
+    val long: Double,
+    val name: String
 )

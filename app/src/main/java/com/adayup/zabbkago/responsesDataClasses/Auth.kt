@@ -1,8 +1,7 @@
 package com.adayup.zabbkago.responsesDataClasses
 
 data class Auth(
-    val auth: String,
-    val id: String?,
-    val api_key: String?,
-    val rank_points: Int?
+    val session_token: String,
+    val status: String,
+    val user_id: String
 )

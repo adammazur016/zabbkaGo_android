@@ -6,9 +6,9 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface authApiService {
-    @POST("login")
+    @POST("/v1/login")
     suspend fun getTodo(
-        @Query("user") user: String,
+        @Query("username") user: String,
         @Query("password") password: String
     ): Response<Auth> // Ensure com.adayup.zabbkago.responsesDataClasses.Auth is correctly defined to match the expected response
 }

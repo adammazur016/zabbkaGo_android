@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/baseline_home_24"
+        android:title="Home"  />
+    <item
+        android:id="@+id/ranking"
+        android:icon="@drawable/baseline_format_list_numbered_24"
+        android:title="Ranking" />
+    <item
+        android:id="@+id/achievements"
+        android:icon="@drawable/baseline_30fps_select_24"
+        android:title="Achievements" />
+    <item
+        android:id="@+id/places"
+        android:title="Places"
+        android:icon="@drawable/baseline_account_balance_24"
+        />
+</menu>

@@ -1,4 +1,6 @@
 package com.adayup.zabbkago.responsesDataClasses
-data class makeVisit(
-    val Status: String
+
+data class MakeVisit (
+    val message: String,
+    val status: String
 )

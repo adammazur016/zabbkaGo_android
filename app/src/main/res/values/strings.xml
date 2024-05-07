@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">zabbkaGo</string>
     <string name="app_maps_api">AIzaSyA2GxzezhPAgBzTxLNHBzc1mZ5WWhrUpDo</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
