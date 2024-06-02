@@ -15,6 +15,7 @@ import android.widget.TextView
 import com.adayup.zabbkago.MainActivity
 import com.adayup.zabbkago.MapsActivity
 import com.adayup.zabbkago.R
+import sharedKeys
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,20 +44,19 @@ class HomeFragment : Fragment() {
 
 
     //making the keys
-    var PREFS_KEY = "prefs"
-    var EMAIL_KEY = "email"
-    var PWD_KEY = "pwd"
+    private val keys = sharedKeys()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view =  inflater.inflate(R.layout.fragment_home, container, false)
-        val sharedPreferences = activity?.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+        val sharedPreferences = activity?.getSharedPreferences(keys.PREFS_KEY, Context.MODE_PRIVATE)
         val usernameTextView = view.findViewById<TextView>(R.id.home_page_username)
 
         if (sharedPreferences != null) {
-            usernameTextView.text = sharedPreferences.getString(EMAIL_KEY, null).toString()
+            usernameTextView.text = sharedPreferences.getString(keys.EMAIL_KEY, null).toString()
         }
 
         logoutButton = view.findViewById(R.id.logout_button)
@@ -67,8 +67,8 @@ class HomeFragment : Fragment() {
 
             sharedPreferences?.let {
                 val editor = it.edit()
-                editor.putString(EMAIL_KEY, "")
-                editor.putString(PWD_KEY, "")
+                editor.putString(keys.EMAIL_KEY, "")
+                editor.putString(keys.PWD_KEY, "")
                 editor.apply()
             }
 
@@ -82,8 +82,6 @@ class HomeFragment : Fragment() {
 
             //close the current activity
             activity?.finish()
-        } ?: run {
-            Log.e("SharedPreferencesError", "Failed to retrieve shared preferences.")
         }
 
         return view

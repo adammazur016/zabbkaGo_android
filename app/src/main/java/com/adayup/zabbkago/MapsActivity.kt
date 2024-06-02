@@ -9,10 +9,8 @@ import android.graphics.Color
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -20,9 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.adayup.zabbkago.apiFunctions.getPlacesApiCall
 import com.adayup.zabbkago.apiFunctions.getUserDetailsApiCall
-import com.adayup.zabbkago.apiFunctions.incrementRankApiCall
 import com.adayup.zabbkago.apiFunctions.makeVisitApiCall
-import com.adayup.zabbkago.responsesDataClasses.MakeVisit
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -41,6 +37,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 
 import kotlinx.coroutines.launch
+import sharedKeys
 import kotlin.math.sqrt
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
@@ -55,22 +52,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
 
 
     lateinit var sharedPreferences: SharedPreferences
-    val API_KEY = "api_key"
-    val USER_ID_KEY = "id"
-    val PREFS_KEY = "prefs"
-    val RANK_KEY = "rank"
-    val ID_KEY = "id"
-
+    val keys = sharedKeys()
     //stores the places to add markers at
-    var punkty: List<Place> = emptyList()
+    var globalPoints: List<Place> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
         //init of sharedpreferences
-        sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
-        val userID = sharedPreferences.getString(ID_KEY, "null")
+        sharedPreferences = getSharedPreferences(keys.PREFS_KEY, Context.MODE_PRIVATE)
+        val userID = sharedPreferences.getString(keys.USER_ID_KEY, "null")
 
         //fusedLocationProviderClient gets user location
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
@@ -117,34 +109,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
         mMap.addMarker(MarkerOptions().position(test1).title(place.id.toString()).icon(BitmapDescriptorFactory.fromResource(R.drawable.markericon50)))
     }
 
-
-
-    private fun updateMapLocation(location: Location, points: List<Place>) {
-        val latLng = LatLng(location.latitude, location.longitude)
-        mMap.clear() // Clear the previous location marker
-        mMap.addMarker(MarkerOptions().position(latLng).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.test50)))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
-        mMap.addCircle(CircleOptions().center(latLng).strokeColor(Color.argb(220, 4, 237, 0)).radius(30.0).fillColor(Color.argb(80,194, 250, 192)))
-
-        punkty = points
-
-        for(point in points){
-            addMarker(point)
-        }
-    }
-
     private fun updateMapLocation(location: Location) {
         val latLng = LatLng(location.latitude, location.longitude)
         mMap.clear()
         mMap.setMinZoomPreference(15f)
         mMap.setMaxZoomPreference(18f)
-        // Clear the previous location marker
 
         mMap.addMarker(MarkerOptions().position(latLng).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.test50)))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
         mMap.addCircle(CircleOptions().center(latLng).strokeColor(Color.argb(220, 4, 237, 0)).radius(30.0).fillColor(Color.argb(80,194, 250, 192)))
-
-        for(point in punkty){
+        for(point in globalPoints){
             addMarker(point)
         }
     }
@@ -202,12 +176,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
             val context = applicationContext
             var points = getPlacesApiCall(context)
 
-            //TODO: try without the two paramters construction
-            //TODO: make punkty = points, it whould work
+            globalPoints = points
 
-            updateMapLocation(currentLocation, points)
+            updateMapLocation(currentLocation)
         }
-        val rank = sharedPreferences.getString(RANK_KEY, null).toString()
+        val rank = sharedPreferences.getString(keys.RANK_KEY, null).toString()
         val rankView = findViewById<TextView>(R.id.rankView)
         rankView.setText("Rank points: " + rank);
     }

@@ -1,5 +1,4 @@
 // In this file the list of comments and subcomments is displayed as recycler view.
-// It uses item_comment.xml and item_subcomment.xml layout for every element of the list
 
 import android.util.Log
 import android.view.LayoutInflater

@@ -7,14 +7,14 @@ import com.adayup.zabbkago.responsesDataClasses.Place
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
+import sharedKeys
 
 private lateinit var sharedPreferences: SharedPreferences
-private val API_KEY = "api_key"
-private var PREFS_KEY = "prefs"
+private val keys = sharedKeys()
 suspend fun getPlacesApiCall(context: Context): List<Place>{
     val service = RetrofitClient.retrofitInstance.create(GetPlacesApiService::class.java)
-    sharedPreferences = context.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
-    val apiKey = sharedPreferences.getString(API_KEY, null).toString()
+    sharedPreferences = context.getSharedPreferences(keys.PREFS_KEY, Context.MODE_PRIVATE)
+    val apiKey = sharedPreferences.getString(keys.API_KEY, null).toString()
     val response: Response<List<Place>> = withContext(Dispatchers.IO) {
         service.GetPlaces(apiKey)
     }

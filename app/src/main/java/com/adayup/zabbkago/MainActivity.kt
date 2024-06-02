@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import sharedKeys
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,12 +19,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var sharedPreferences: SharedPreferences
 
     //making the keys
-    var PREFS_KEY = "prefs"
-    var EMAIL_KEY = "email"
-    var PWD_KEY = "pwd"
-    var ID_KEY = "id"
-    var API_KEY = "api_key"
-    var RANK_KEY = "rank"
+    private val keys = sharedKeys()
 
     //making the email and passwd
     var email = ""
@@ -59,11 +55,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         //getting the email data from the shared preferences and writing it to email var
-        sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
-        email = sharedPreferences.getString(EMAIL_KEY, "").toString()
+        sharedPreferences = getSharedPreferences(keys.PREFS_KEY, Context.MODE_PRIVATE)
+        email = sharedPreferences.getString(keys.EMAIL_KEY, "").toString()
 
         //same for pwd
-        pwd = sharedPreferences.getString(PWD_KEY, "").toString()
+        pwd = sharedPreferences.getString(keys.PWD_KEY, "").toString()
     }
 
 

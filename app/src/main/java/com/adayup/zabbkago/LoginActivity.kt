@@ -19,6 +19,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import sharedKeys
 
 
 class LoginActivity : AppCompatActivity() {
@@ -30,11 +31,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
 
     //making the keys
-    private val PREFS_KEY = "prefs"
-    private val EMAIL_KEY = "email"
-    private val PWD_KEY = "pwd"
-    private val ID_KEY = "id"
-    private val API_KEY = "api_key"
+    private val keys = sharedKeys()
     private val permissionCode = 101
 
     //making the email and passwd
@@ -52,8 +49,8 @@ class LoginActivity : AppCompatActivity() {
             val todo = response.body()
             todo?.let {
                 val editor: SharedPreferences.Editor = sharedPreferences.edit()
-                editor.putString(API_KEY, todo.session_token)
-                editor.putString(ID_KEY, todo.user_id)
+                editor.putString(keys.API_KEY, todo.session_token)
+                editor.putString(keys.ID_KEY, todo.user_id)
                 editor.apply()
                 return it.status // Assuming 'auth' is the field you're interested in
             }
@@ -84,13 +81,13 @@ class LoginActivity : AppCompatActivity() {
         }
 
         //Initializing shared preferences with the key to them
-        sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(keys.PREFS_KEY, Context.MODE_PRIVATE)
 
         //getting the email data from the shared preferences and writing it to email var
-        email = sharedPreferences.getString(EMAIL_KEY, "").toString()
+        email = sharedPreferences.getString(keys.EMAIL_KEY, "").toString()
 
         //same for pwd
-        pwd = sharedPreferences.getString(PWD_KEY, "").toString()
+        pwd = sharedPreferences.getString(keys.PWD_KEY, "").toString()
 
         //now listening for btn to be clicked
         loginBtn.setOnClickListener {
@@ -111,8 +108,8 @@ class LoginActivity : AppCompatActivity() {
                         val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
                         //save the email and the password to the shared pref
-                        editor.putString(EMAIL_KEY, emailEdt.text.toString())
-                        editor.putString(PWD_KEY, pwdEdt.text.toString())
+                        editor.putString(keys.EMAIL_KEY, emailEdt.text.toString())
+                        editor.putString(keys.PWD_KEY, pwdEdt.text.toString())
 
                         //apply the changes
                         editor.apply()

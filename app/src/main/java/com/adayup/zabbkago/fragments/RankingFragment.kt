@@ -9,8 +9,7 @@ import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.adayup.zabbkago.R
-import com.adayup.zabbkago.apiFunctions.GetUserRankingListApiCall
-import com.adayup.zabbkago.apiFunctions.getAchievementsListApiCall
+import com.adayup.zabbkago.apiFunctions.getUserRankingListApiCall
 import kotlinx.coroutines.launch
 
 
@@ -49,7 +48,7 @@ class RankingFragment : Fragment() {
 
         lifecycleScope.launch {
             var ranking = listOf<String>()
-            val usersList = GetUserRankingListApiCall(view.context)
+            val usersList = getUserRankingListApiCall(view.context)
 
             var i = 1
 

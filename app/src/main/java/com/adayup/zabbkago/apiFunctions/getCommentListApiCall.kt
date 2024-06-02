@@ -2,7 +2,6 @@ package com.adayup.zabbkago.apiFunctions
 
 import com.adayup.zabbkago.interfaces.GetCommentListService
 import com.adayup.zabbkago.responsesDataClasses.Comment
-import com.adayup.zabbkago.responsesDataClasses.UserDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response

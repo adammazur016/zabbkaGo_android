@@ -1,13 +1,9 @@
 package com.adayup.zabbkago.apiFunctions
-
-import android.content.Context
 import com.adayup.zabbkago.interfaces.RegisterApiService
 import com.adayup.zabbkago.responsesDataClasses.Register
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
-
 
 suspend fun registerApiCall (login: String, password: String): Register {
     val service = RetrofitClient.retrofitInstance.create(RegisterApiService::class.java)
