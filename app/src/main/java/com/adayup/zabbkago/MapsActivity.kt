@@ -18,7 +18,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
-import com.adayup.zabbkago.apiFunctions.ID_KEY
 import com.adayup.zabbkago.apiFunctions.getPlacesApiCall
 import com.adayup.zabbkago.apiFunctions.getUserDetailsApiCall
 import com.adayup.zabbkago.apiFunctions.incrementRankApiCall
@@ -47,9 +46,7 @@ import kotlin.math.sqrt
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListener {
 
     private lateinit var mMap: GoogleMap
-
     private lateinit var currentLocation: Location
-
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private val permissionCode = 101
 
@@ -60,14 +57,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
     lateinit var sharedPreferences: SharedPreferences
     val API_KEY = "api_key"
     val USER_ID_KEY = "id"
-    var PREFS_KEY = "prefs"
-    var RANK_KEY = "rank"
+    val PREFS_KEY = "prefs"
+    val RANK_KEY = "rank"
+    val ID_KEY = "id"
+
+    //stores the places to add markers at
+    var punkty: List<Place> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+
+        //init of sharedpreferences
         sharedPreferences = getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
         val userID = sharedPreferences.getString(ID_KEY, "null")
+
+        //fusedLocationProviderClient gets user location
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         if (userID != null){
@@ -77,23 +82,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
             }
         }
 
-
+        //gets user location every 10 seconds
         locationRequest = LocationRequest.create().apply {
             interval = 1000 // Request location update every 10 seconds
             fastestInterval = 500 // The fastest interval for location updates, 5 seconds
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
+        //update the location after obtained
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
-                    // Handle the new location update here
                     currentLocation = location
                     lifecycleScope.launch {
-
                         //update only the user info
                         updateMapLocation(currentLocation)
-                    } // You'll implement this method next
+                    }
                 }
             }
         }
@@ -113,11 +117,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
         mMap.addMarker(MarkerOptions().position(test1).title(place.id.toString()).icon(BitmapDescriptorFactory.fromResource(R.drawable.markericon50)))
     }
 
-    var punkty: List<Place> = emptyList()
+
+
     private fun updateMapLocation(location: Location, points: List<Place>) {
         val latLng = LatLng(location.latitude, location.longitude)
         mMap.clear() // Clear the previous location marker
-
         mMap.addMarker(MarkerOptions().position(latLng).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.test50)))
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 18f))
         mMap.addCircle(CircleOptions().center(latLng).strokeColor(Color.argb(220, 4, 237, 0)).radius(30.0).fillColor(Color.argb(80,194, 250, 192)))
@@ -197,6 +201,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
         lifecycleScope.launch {
             val context = applicationContext
             var points = getPlacesApiCall(context)
+
+            //TODO: try without the two paramters construction
+            //TODO: make punkty = points, it whould work
+
             updateMapLocation(currentLocation, points)
         }
         val rank = sharedPreferences.getString(RANK_KEY, null).toString()
@@ -232,25 +240,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, OnMarkerClickListe
 
         markerTitle = myMarker.title.toString()
 
+        //If user clicked on himself, don't do anything
         if(myMarker.title == "Current Location"){
             return true
         }
+
+        //Calculate the vector disctance between user and the marker
         val vectorLength: Double = getVectorLength(currentLocation.latitude, myMarker.position.latitude, currentLocation.longitude, myMarker.position.longitude)
         Log.d("VECTOR LENGTH", vectorLength.toString())
+
+        //If the marker is in the green circle, add the ponit to visits
         if(vectorLength < 3.6848094149922953E-4){
             Log.d("CLICKED", markerTitle)
             lifecycleScope.launch {
                 val response = makeVisitApiCall(applicationContext, markerTitle)
 
-                if (response.message == "visit_marked"){
+                if (response.message == "visit_done"){
                     Toast.makeText(applicationContext, "Putting the point to your account", Toast.LENGTH_LONG).show()
+
                 } else {
                     Toast.makeText(applicationContext, "Please come back in next day", Toast.LENGTH_LONG).show()
                     Log.d("CLICKED", "something went wrong")
                 }
             }
-
-
         } else {
             Toast.makeText(applicationContext, "Get closer to that point", Toast.LENGTH_LONG).show()
         }

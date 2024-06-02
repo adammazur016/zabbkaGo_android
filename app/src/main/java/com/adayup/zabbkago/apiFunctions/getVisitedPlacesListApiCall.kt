@@ -15,6 +15,7 @@ private lateinit var sharedPreferences: SharedPreferences
 private val API_KEY = "api_key"
 private var PREFS_KEY = "prefs"
 private var RANK_KEY = "rank"
+var ID_KEY = "id"
 suspend fun getVisitedPlacesListApiCall(context: Context): List<VisitedPlace> {
     val service = RetrofitClient.retrofitInstance.create(GetVisitedPlaceService::class.java)
     sharedPreferences = context.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)

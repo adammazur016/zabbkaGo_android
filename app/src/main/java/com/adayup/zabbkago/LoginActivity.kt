@@ -24,25 +24,25 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
 
     //creating variables to hold element of layouts
-    lateinit var emailEdt: EditText
-    lateinit var pwdEdt: EditText
-    lateinit var loginBtn: Button
-    lateinit var sharedPreferences: SharedPreferences
+    private lateinit var emailEdt: EditText
+    private lateinit var pwdEdt: EditText
+    private lateinit var loginBtn: Button
+    private lateinit var sharedPreferences: SharedPreferences
 
     //making the keys
-    var PREFS_KEY = "prefs"
-    var EMAIL_KEY = "email"
-    var PWD_KEY = "pwd"
-    var ID_KEY = "id"
-    var API_KEY = "api_key"
-    var RANK_KEY = "rank"
+    private val PREFS_KEY = "prefs"
+    private val EMAIL_KEY = "email"
+    private val PWD_KEY = "pwd"
+    private val ID_KEY = "id"
+    private val API_KEY = "api_key"
     private val permissionCode = 101
 
     //making the email and passwd
-    var email = ""
-    var pwd = ""
+    private var email = ""
+    private var pwd = ""
 
-    suspend fun makeApiCall(par1: String, par2: String): String{
+    //TODO: move function below to the apiFunctions as loginApiCall
+    private suspend fun makeApiCall(par1: String, par2: String): String{
         val service = RetrofitClient.retrofitInstance.create(authApiService::class.java)
 
         val response: Response<Auth> = withContext(Dispatchers.IO) {
@@ -53,7 +53,7 @@ class LoginActivity : AppCompatActivity() {
             todo?.let {
                 val editor: SharedPreferences.Editor = sharedPreferences.edit()
                 editor.putString(API_KEY, todo.session_token)
-                editor.putString(ID_KEY, todo.user_id.toString())
+                editor.putString(ID_KEY, todo.user_id)
                 editor.apply()
                 return it.status // Assuming 'auth' is the field you're interested in
             }
@@ -80,7 +80,7 @@ class LoginActivity : AppCompatActivity() {
         loginBtn = findViewById(R.id.idBtnLogin)
 
         fun makeToast(){
-            Toast.makeText(this, "Please Enter Email and Password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please Enter Email and Password", Toast.LENGTH_SHORT).show()
         }
 
         //Initializing shared preferences with the key to them
@@ -102,60 +102,43 @@ class LoginActivity : AppCompatActivity() {
 
                 //API call goes here
                 lifecycleScope.launch {
-                    // Since makeApiCall is a suspend function, it can be called directly here
-                    val result = makeApiCall(emailEdt.text.toString(), pwdEdt.text.toString())
-                    // Use the result, e.g., update UI or log the result
-                    // Make sure to perform UI operations on the main thread
-                    Log.d("LoginResult", "Result: $result")
-                    // If updating UI, make sure this is run on the main thread. For example:
-                    // textView.text = result
 
-                    if(result.toString() == "success"){
-                        Log.d("DEBUG", "poprawnie zalogowano")
+                    val result = makeApiCall(emailEdt.text.toString(), pwdEdt.text.toString())
+                    Log.d("LoginResult", "Result: $result")
+
+                    if(result == "success"){
                         //initializing the shared preferences editor
                         val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
                         //save the email and the password to the shared pref
-                        Log.d("Put", emailEdt.text.toString())
-                        Log.d("Put", pwdEdt.text.toString())
                         editor.putString(EMAIL_KEY, emailEdt.text.toString())
                         editor.putString(PWD_KEY, pwdEdt.text.toString())
-
 
                         //apply the changes
                         editor.apply()
 
                         //get to the maps
                         val i = Intent(this@LoginActivity, MapsActivity::class.java)
-
                         startActivity(i)
 
                         //close the current activity
                         finish()
                     } else {
-                        Log.d("DEBUG", "NIEPOPRAWNIE ZALOGOWANO")
                         makeToast()
                     }
                 }
             }
         }
     }
+
+    // If you open the app, you should be navigated to MapsActivity if you are logged already
     override fun onStart() {
         super.onStart()
         // in this method we are checking if email and pwd are not empty.
-        if (!email.equals("") && !pwd.equals("")) {
-            Log.d("DEBUG", email)
-            Log.d("DEBUG", pwd)
-            // if email and pwd is not empty we
-            // are opening our main 2 activity on below line.
+        // should be set when logged in successfully
+        if (email !== "" && pwd !== "") {
             val i = Intent(this@LoginActivity, MapsActivity::class.java)
-
-            // on below line we are calling start
-            // activity method to start our activity.
             startActivity(i)
-
-            // on below line we are calling
-            // finish to finish our main activity.
             finish()
         }
     }
@@ -166,7 +149,5 @@ class LoginActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
     }
-
 }

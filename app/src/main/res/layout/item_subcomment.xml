@@ -3,25 +3,38 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/subUsername"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="User01"
-        android:layout_marginLeft="25sp"
-        android:textSize="18sp"
-        android:textColor="#0000FF">
+        android:id="@+id/subomment_username"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:gravity="center"
+        android:layout_marginLeft="45sp">
 
-    </TextView>
+        <ImageView
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:src="@mipmap/ic_logo_frog" />
+        <TextView
+            android:id="@+id/subUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User01"
+            android:layout_marginLeft="5sp"
+            android:textSize="18sp"
+            android:textColor="#0000FF">
+
+        </TextView>
+    </LinearLayout>
+
     <TextView
         android:id="@+id/subComment"
-        app:layout_constraintTop_toBottomOf="@+id/subUsername"
+        app:layout_constraintTop_toBottomOf="@+id/subomment_username"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="50sp"
+        android:layout_marginLeft="75sp"
         android:text="content"
         android:textSize="14sp">
     </TextView>

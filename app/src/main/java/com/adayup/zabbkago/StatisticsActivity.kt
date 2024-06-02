@@ -16,7 +16,7 @@ class StatisticsActivity : AppCompatActivity() {
 
     lateinit var bottomNav : BottomNavigationView
 
-    public fun loadFragment(fragment: Fragment){
+    private fun loadFragment(fragment: Fragment){
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.container, fragment)
         transaction.commit()
@@ -26,6 +26,7 @@ class StatisticsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main2)
         loadFragment(HomeFragment())
 
+        //Uses bottom navigation element
         bottomNav = findViewById(R.id.navMenu)
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
@@ -56,13 +57,7 @@ class StatisticsActivity : AppCompatActivity() {
         val backButton: ImageView = findViewById(R.id.back_button)
         backButton.setOnClickListener {
             val i = Intent(this@StatisticsActivity, MapsActivity::class.java)
-
-            // on below line we are calling start
-            // activity method to start our activity.
             startActivity(i)
-
-            // on below line we are calling
-            // finish to finish our main activity.
             finish()
         }
     }

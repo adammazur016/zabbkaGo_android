@@ -1,3 +1,6 @@
+// In this file the list of achievement is displayed as recycler view.
+// It uses item_achievement.xml layout for every element of the list
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +27,6 @@ class AchievementAdapter(private val achievementItem: List<AchievementItem>) : R
         holder.title.text = currentItem.title
         holder.description.text = currentItem.description
         holder.progressBar.progress = currentItem.progress
-        // Set image for holder.storeBanner using Glide or similar
-        // Set click listener for holder.storeButton
     }
 
     override fun getItemCount(): Int {

@@ -1,10 +1,12 @@
 package com.adayup.zabbkago.apiFunctions
 
-import com.adayup.zabbkago.interfaces.GetUserDetailsService
+import GetUserShopLikeApiService
 import com.adayup.zabbkago.responsesDataClasses.UserDetails
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.adayup.zabbkago.interfaces.GetUserRankingListService
+import com.adayup.zabbkago.responsesDataClasses.GetUserShopLike
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,20 +16,18 @@ private lateinit var sharedPreferences: SharedPreferences
 private val API_KEY = "api_key"
 private var PREFS_KEY = "prefs"
 private var RANK_KEY = "rank"
-suspend fun getUserDetailsApiCall(context: Context, userID: String): UserDetails {
-    val service = RetrofitClient.retrofitInstance.create(GetUserDetailsService::class.java)
+suspend fun getUserShopLikeApiCall(context: Context, shopID: Int): GetUserShopLike {
+    val service = RetrofitClient.retrofitInstance.create(GetUserShopLikeApiService::class.java)
     sharedPreferences = context.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE)
-    val response: Response<UserDetails> = withContext(Dispatchers.IO) {
-        service.GetUserDetailsService(userID)
+    val apiKey = sharedPreferences.getString(API_KEY, null).toString()
+    val response: Response<GetUserShopLike> = withContext(Dispatchers.IO) {
+        service.GetUserShopLike(shopID, apiKey)
     }
     if (response.isSuccessful) {
         val res = response.body()
         res?.let {
-            val editor: SharedPreferences.Editor = sharedPreferences.edit()
-            editor.putString(RANK_KEY, it.points.toString())
-            editor.apply()
             return it
         }
     }
-    return UserDetails(-1,"",-1)
+    return GetUserShopLike("Error", "Error in API call")
 }
