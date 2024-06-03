@@ -59,25 +59,27 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="You visited today"
+            android:text="You visited today "
             android:textAlignment="textStart"
             android:textSize="18sp"
 
             tools:ignore="RtlCompat" />
 
         <TextView
+            android:id="@+id/today_visit_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" 4 "
+            android:text="0"
             android:textAlignment="textStart"
             android:textColor="#FF0000"
             android:textSize="24sp"
             tools:ignore="RtlCompat" />
 
         <TextView
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="shops"
+            android:text=" shops"
             android:textAlignment="textStart"
             android:textSize="18sp"
 
@@ -97,16 +99,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="You visited in total"
+            android:text="You visited in total "
             android:textAlignment="textStart"
             android:textSize="18sp"
 
             tools:ignore="RtlCompat" />
 
         <TextView
+            android:id="@+id/total_visit_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" 25 "
+            android:text="0"
             android:textAlignment="textStart"
             android:textColor="#05b027"
             android:textSize="24sp"
@@ -115,10 +118,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="shops"
+            android:text=" shops"
             android:textAlignment="textStart"
             android:textSize="18sp"
-
             tools:ignore="RtlCompat" />
     </LinearLayout>
     <ImageView
@@ -143,52 +145,23 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="You are"
+            android:text="You have "
             android:textSize="18sp">
-
         </TextView>
         <TextView
+            android:id="@+id/ranking_points_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" 505 "
+            android:text="0"
             android:textSize="24sp"
             android:textColor="#0522b0">
-
         </TextView>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="in the ranking"
+            android:text=" ranking points"
             android:textSize="18sp">
 
-        </TextView>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/progressBar"
-        app:layout_constraintLeft_toLeftOf="parent"
-        >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Your next goal is to visit "
-            >
-        </TextView>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="50 "
-            android:textColor="#00FF00"
-            android:textSize="20sp"
-            >
-        </TextView>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="shops"
-            >
         </TextView>
     </LinearLayout>
 
@@ -205,15 +178,5 @@
 
     </Button>
 
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="20sp"
-        app:layout_constraintBottom_toTopOf="@id/logout_button"
-        android:max="100"
-        android:progress="50"
-        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

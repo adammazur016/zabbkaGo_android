@@ -10,5 +10,5 @@ interface authApiService {
     suspend fun getTodo(
         @Query("username") user: String,
         @Query("password") password: String
-    ): Response<Auth> // Ensure com.adayup.zabbkago.responsesDataClasses.Auth is correctly defined to match the expected response
+    ): Response<Auth>
 }

@@ -27,6 +27,7 @@ import com.adayup.zabbkago.apiFunctions.getUserDetailsApiCall
 import com.adayup.zabbkago.apiFunctions.getUserShopLikeApiCall
 import com.adayup.zabbkago.interfaces.CommentActionListener
 import com.adayup.zabbkago.responsesDataClasses.Comment
+import com.adayup.zabbkago.responsesDataClasses.UserDetails
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
@@ -77,18 +78,26 @@ class PageDetailsFragment : Fragment(), CommentActionListener {
             storeID?.let {
                 val allComments = getCommentListApiCall(it)
                 commentCountTextView.text = allComments.size.toString()
+                val userIDList = mutableListOf<Int>()
+                val userDetailsList = mutableListOf<UserDetails>()
                 val allCommentsItems = mutableListOf<CommentItem>()
                 allComments.forEach { elem ->
-                    val userData = view?.let { it1 ->
-                        getUserDetailsApiCall(
-                            context = it1.context,
-                            userID = elem.user_id.toString()
-                        )
+                    if (!userIDList.contains(elem.user_id)) {
+                        val userData = view?.let { it1 ->
+                            getUserDetailsApiCall(
+                                context = it1.context,
+                                userID = elem.user_id.toString()
+                            )
+                        }
+                        if (userData != null) {
+                            userDetailsList.add(userData)
+                            userIDList.add(element = userData.id)
+                        }
                     }
-                    val temp = userData?.let { it1 -> CommentItem(elem.id,elem.content, it1.name, elem.place_id, elem.parent_id) }
-                    if (temp != null) {
-                        allCommentsItems.add(temp)
-                    }
+
+                    val userIndex = userIDList.indexOf(elem.user_id)
+                    val temp = CommentItem(elem.id,elem.content, userDetailsList[userIndex].name, elem.place_id, elem.parent_id)
+                    allCommentsItems.add(temp)
                 }
                 val mainComments = getMainComments(allCommentsItems)
                 commentAdapter = CommentAdapter(mainComments, allCommentsItems, addCommentContent, lifecycleScope, addCommentButton, this@PageDetailsFragment)
