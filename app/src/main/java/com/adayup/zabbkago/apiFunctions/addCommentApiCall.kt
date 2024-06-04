@@ -19,7 +19,7 @@ suspend fun addCommentApiCall(context: Context, content: String, shopID: Int, pa
     sharedPreferences = context.getSharedPreferences(keys.PREFS_KEY, Context.MODE_PRIVATE)
     val apiKey = sharedPreferences.getString(keys.API_KEY, null).toString()
     val response: Response<AddComment> = withContext(Dispatchers.IO) {
-        service.addComment(shopID.toString(), apiKey, content, parentID)
+        service.addComment(shopID, apiKey, content, parentID)
     }
     if (response.isSuccessful) {
         val res = response.body()
@@ -30,7 +30,7 @@ suspend fun addCommentApiCall(context: Context, content: String, shopID: Int, pa
     return AddComment("error in api call")
 }
 
-suspend fun addCommentApiCall(context: Context, content: String, shopID: String): AddComment {
+suspend fun addCommentApiCall(context: Context, content: String, shopID: Int): AddComment {
     val service = RetrofitClient.retrofitInstance.create(AddCommentService::class.java)
     sharedPreferences = context.getSharedPreferences(keys.PREFS_KEY, Context.MODE_PRIVATE)
     val apiKey = sharedPreferences.getString(keys.API_KEY, null).toString()

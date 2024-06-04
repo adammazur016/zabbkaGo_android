@@ -9,7 +9,7 @@ import retrofit2.http.Query
 interface AddCommentService {
     @POST("/v1/shop/{shopID}/comment")
     suspend fun addComment(
-        @Path("shopID") shopID: String,
+        @Path("shopID") shopID: Int,
         @Query("session_token") api_key: String,
         @Query("content") content: String,
         @Query("parent_id") parent_id: Int? = null //the parent_id parameter is optional

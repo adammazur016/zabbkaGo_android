@@ -1,5 +1,6 @@
 package com.adayup.zabbkago.fragments
 
+import PageDetailsFragment
 import StoreAdapter
 import StoreItemClickListener
 import android.animation.ObjectAnimator
