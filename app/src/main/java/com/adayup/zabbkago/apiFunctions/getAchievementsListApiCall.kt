@@ -4,19 +4,16 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.adayup.zabbkago.interfaces.GetAcheivementsListService
 import com.adayup.zabbkago.responsesDataClasses.Achievement
+import com.adayup.zabbkago.responsesDataClasses.AchievementID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import sharedKeys
 
-private lateinit var sharedPreferences: SharedPreferences
-private val keys = sharedKeys()
-suspend fun getAchievementsListApiCall(context: Context): List<Achievement>{
+suspend fun getAchievementsListApiCall(context: Context, userID: Int): List<AchievementID>{
     val service = RetrofitClient.retrofitInstance.create(GetAcheivementsListService::class.java)
-    sharedPreferences = context.getSharedPreferences(keys.PREFS_KEY, Context.MODE_PRIVATE)
-    val apiKey = sharedPreferences.getString(keys.API_KEY, null).toString()
-    val response: Response<List<Achievement>> = withContext(Dispatchers.IO) {
-        service.GetAcheivementsList(apiKey)
+    val response: Response<List<AchievementID>> = withContext(Dispatchers.IO) {
+        service.GetAcheivementsList(userID)
     }
     if (response.isSuccessful) {
         val res = response.body()

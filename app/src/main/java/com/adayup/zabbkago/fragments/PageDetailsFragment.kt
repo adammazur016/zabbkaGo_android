@@ -2,7 +2,6 @@ package com.adayup.zabbkago.fragments
 
 import CommentAdapter
 import android.animation.ObjectAnimator
-import android.media.Image
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,35 +9,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.adayup.zabbkago.R
 import com.adayup.zabbkago.CommentRecyclerViewFiles.CommentItem
-import com.adayup.zabbkago.apiFunctions.addCommentApiCall
 import com.adayup.zabbkago.apiFunctions.addRemoveLikeApiCall
 import com.adayup.zabbkago.apiFunctions.getCommentListApiCall
 import com.adayup.zabbkago.apiFunctions.getShopLikes
 import com.adayup.zabbkago.apiFunctions.getUserDetailsApiCall
 import com.adayup.zabbkago.apiFunctions.getUserShopLikeApiCall
 import com.adayup.zabbkago.interfaces.CommentActionListener
-import com.adayup.zabbkago.responsesDataClasses.Comment
 import com.adayup.zabbkago.responsesDataClasses.UserDetails
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 class PageDetailsFragment : Fragment(), CommentActionListener {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var commentAdapter: CommentAdapter
@@ -49,14 +37,6 @@ class PageDetailsFragment : Fragment(), CommentActionListener {
     private lateinit var likeBtn: ImageView
     private lateinit var likeCountTextView: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
     private fun getMainComments(commentList: List<CommentItem>): List<CommentItem>{
         var mainCommentList = listOf<CommentItem>()
         for (elem in commentList){
@@ -66,7 +46,7 @@ class PageDetailsFragment : Fragment(), CommentActionListener {
         }
         return mainCommentList
     }
-    fun loadComments(addCommentContent: TextInputEditText, addCommentButton: ImageView, commentCountTextView: TextView, loadingImageView: ImageView) {
+    private fun loadComments(addCommentContent: TextInputEditText, addCommentButton: ImageView, commentCountTextView: TextView, loadingImageView: ImageView) {
         val storeID = arguments?.getInt("storeID")
         val rotateAnimation = ObjectAnimator.ofFloat(loadingImageView, "rotation", 0f, 360f).apply {
             duration = 1000 // 1 second for a full rotation
@@ -154,11 +134,11 @@ class PageDetailsFragment : Fragment(), CommentActionListener {
                         var currentCount: Int = likeCountTextView.text.toString().toInt()
                         if(response.message == "like_added"){
                             likeBtn.setImageResource(R.drawable.like_icon)
-                            currentCount = currentCount + 1
+                            currentCount += 1
                             likeCountTextView.text = currentCount.toString()
                         } else {
                             likeBtn.setImageResource(R.drawable.like_icon_unclicked)
-                            currentCount = currentCount - 1
+                            currentCount -= 1
                             likeCountTextView.text = currentCount.toString()
                         }
                     } else {

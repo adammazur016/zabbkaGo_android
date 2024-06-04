@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
-import com.adayup.zabbkago.fragments.AchievementsFragment
+import com.adayup.zabbkago.fragments.UserAchievementsFragment
 import com.adayup.zabbkago.fragments.HomeFragment
 import com.adayup.zabbkago.fragments.VisitedPlacesFragment
 import com.adayup.zabbkago.fragments.RankingFragment
@@ -39,7 +39,7 @@ class StatisticsActivity : AppCompatActivity() {
                     true
                 }
                 R.id.achievements -> {
-                    loadFragment(AchievementsFragment())
+                    loadFragment(UserAchievementsFragment())
                     true
                 }
                 R.id.places -> {
